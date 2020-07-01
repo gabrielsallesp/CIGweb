@@ -1,0 +1,45 @@
+import requests
+import lxml.html
+import re
+from pymongo import MongoClient
+
+url = "https://sites.google.com/view/ghostgns/home"
+
+headers = {
+    'upgrade-insecure-requests': "1",
+    'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36",
+    'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    'cache-control': "no-cache",
+    'postman-token': "d44e3617-cad5-3644-9d0b-733ea4ae8204"
+    }
+
+response = requests.request("GET", url, headers=headers)
+
+a = response.text
+lista = re.findall('&lt;td&gt;(.*)&lt;/td&gt',a)
+n = 14
+splited = [lista[i::n] for i in range(n)]
+
+
+for i in range(1,40):
+    try:
+        a = {'pedido':splited[0][i],
+        'data_venda':splited[1][i],
+        'quantidade_parcelas':splited[2][i],
+        'valor_venda':splited[3][i],
+        'numero_cartao':splited[4][i],
+        'tipo_transacao':splited[5][i],
+        'status':splited[6][i],
+        'valor_parcela':splited[7][i],
+        'numero_parcela':splited[8][i],
+        'operadora':splited[9][i],
+        'bandeira_cartao':splited[10][i],
+        'local_estabelecimento':splited[11][i],
+        'documento':splited[12][i],
+        'nome_comprador':splited[13][i]
+        }
+        collection.insert_one(a)
+        print(a)
+    except:
+        pass
+    
